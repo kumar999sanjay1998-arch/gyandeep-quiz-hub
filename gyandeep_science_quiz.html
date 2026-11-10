@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ज्ञानदीप QUIZ HUB – विज्ञान क्विज</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#172033;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0;padding:18px}.wrap{max-width:720px;margin:auto}
+header{background:#173b70;color:#fff;padding:22px;border-radius:18px;margin-bottom:16px}
+h1{font-size:23px;margin:0 0 6px}header p{margin:4px 0;color:#e5efff}
+.panel,.qcard{background:#fff;border-radius:16px;padding:17px;margin:12px 0;box-shadow:0 3px 14px #17203312}
+label{display:block;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+.qtitle{font-weight:700;line-height:1.55;margin-bottom:12px}.option{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #d8e0eb;border-radius:11px;margin:8px 0;cursor:pointer;line-height:1.4}
+.option input{width:auto;accent-color:#1769aa}.option.correct{background:#e5f7eb;border-color:#20a455;color:#126b35}.option.wrong{background:#ffebeb;border-color:#dc4545;color:#a51f1f}
+.feedback{font-size:14px;margin:9px 2px 0;min-height:20px}.meta{font-size:14px;color:#526078}
+button{border:0;background:#1769aa;color:white;padding:13px 18px;border-radius:11px;font-size:16px;font-weight:700;cursor:pointer;margin:8px 5px 0 0}
+button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#e6edf7;color:#173b70}
+#result{display:none;text-align:center}.score{font-size:34px;font-weight:800;color:#1769aa}.small{font-size:13px;color:#64748b}
+</style>
+</head>
+<body><main class="wrap">
+<header><h1>📚 ज्ञानदीप QUIZ HUB</h1><p>विज्ञान क्विज • कुल प्रश्न: 10 • प्रत्येक प्रश्न: 1 अंक</p><p>सही उत्तर हरे और गलत उत्तर लाल रंग में दिखाई देंगे।</p></header>
+<section class="panel"><label for="student">विद्यार्थी का नाम लिखें</label><input id="student" placeholder="अपना नाम लिखें" maxlength="60"></section>
+<div id="quiz"></div>
+<section class="panel" id="result"><h2>क्विज पूरा हुआ!</h2><div id="score" class="score"></div><p id="summary"></p><button onclick="location.reload()">दोबारा क्विज दें</button><button class="secondary" onclick="shareResult()">परिणाम WhatsApp पर भेजें</button></section>
+<p class="small">ज्ञान ही शक्ति है • शिक्षा ही सफलता की कुंजी है</p>
+</main>
+<script>
+const questions=[
+["इत्र की गंध वायु में चारों ओर फैलने की प्रक्रिया कहलाती है—",["वाष्पन","विसरण","संघनन","ऊर्ध्वपातन"],1,"गंध के कण वायु में फैलते हैं।"],
+["कपूर को शुद्ध रूप में प्राप्त करने के लिए किस विधि का प्रयोग किया जाता है?",["आसवन","छानना","वाष्पन","ऊर्ध्वपातन"],3,"कपूर गर्म करने पर सीधे वाष्प बन सकता है।"],
+["शुष्क बर्फ (Dry Ice) किसका ठोस रूप है?",["CO","NH₃","CH₃COOH","CO₂"],3,"शुष्क बर्फ ठोस कार्बन डाइऑक्साइड है।"],
+["किसी पदार्थ के इकाई आयतन के द्रव्यमान को क्या कहते हैं?",["घनत्व","तरलता","श्यानता","आयतन"],0,"घनत्व द्रव्यमान और आयतन का अनुपात है।"],
+["निम्नलिखित में से कौन-सा पदार्थ ऊर्ध्वपातित नहीं होता है?",["आयोडीन","नौसादर","कपूर","जल"],3,"जल सामान्यतः गर्म करने पर द्रव से वाष्प बनता है।"],
+["सोडियम का लैटिन नाम क्या है?",["Argentum","Cuprum","Natrium","Plumbum"],2,"Natrium से सोडियम का संकेत Na बना है।"],
+["निश्चित अनुपात के नियम का प्रतिपादन किसने किया था?",["लावोजियर","प्राउस्ट","कणाद","डाल्टन"],1,"प्राउस्ट ने निश्चित अनुपात का नियम दिया।"],
+["कैल्सियम फॉस्फेट का सही रासायनिक सूत्र कौन-सा है?",["Ca₂PO₄","Ca₃(PO₄)₂","CaPO₄","Ca(PO₄)₂"],1,"तीन Ca²⁺ और दो PO₄³⁻ आयन संतुलित होते हैं।"],
+["कोबाल्ट का सही रासायनिक संकेत क्या है?",["Co","Cb","Ko","Ct"],0,"कोबाल्ट का संकेत Co है।"],
+["Fe₂(SO₄)₃ में Fe की ऑक्सीकरण अवस्था कितनी है?",["+2","+3","+4","+5"],1,"तीन सल्फेट आयनों का कुल आवेश −6 है, इसलिए दो Fe का कुल आवेश +6 होगा।"]
+];
+const letters=["A","B","C","D"];let picks=Array(questions.length).fill(null),done=false;
+const root=document.getElementById("quiz");
+questions.forEach((q,i)=>{
+ const card=document.createElement("section");card.className="qcard";card.innerHTML=`<div class="meta">प्रश्न ${i+1} / 10</div><div class="qtitle">${i+1}. ${q[0]}</div>`;
+ q[1].forEach((opt,j)=>{const lab=document.createElement("label");lab.className="option";lab.innerHTML=`<input type="radio" name="q${i}" value="${j}"><span><b>(${letters[j]})</b> ${opt}</span>`;lab.querySelector("input").addEventListener("change",()=>choose(i,j,card));card.appendChild(lab)});
+ const fb=document.createElement("div");fb.className="feedback";fb.id=`fb${i}`;card.appendChild(fb);root.appendChild(card);
+});
+function choose(i,j,card){if(done||picks[i]!==null)return;picks[i]=j;const correct=questions[i][2];card.querySelectorAll(".option").forEach((el,k)=>{el.querySelector("input").disabled=true;if(k===correct)el.classList.add("correct");if(k===j&&j!==correct)el.classList.add("wrong")});document.getElementById(`fb${i}`).textContent=(j===correct?"सही उत्तर! ":"गलत उत्तर। सही उत्तर: "+letters[correct]+". ")+questions[i][3];if(picks.every(x=>x!==null))finish();}
+function finish(){done=true;const score=picks.filter((v,i)=>v===questions[i][2]).length;document.getElementById("result").style.display="block";document.getElementById("score").textContent=`${score} / 10 अंक`;document.getElementById("summary").textContent=`${document.getElementById("student").value.trim()||"विद्यार्थी"} ने ${score} प्रश्नों के सही उत्तर दिए।`;document.getElementById("result").scrollIntoView({behavior:"smooth"});}
+function shareResult(){const name=document.getElementById("student").value.trim()||"विद्यार्थी";const score=picks.filter((v,i)=>v===questions[i][2]).length;const msg=`📚 ज्ञानदीप QUIZ HUB\nविज्ञान क्विज परिणाम\nनाम: ${name}\nप्राप्त अंक: ${score}/10`;window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");}
+</script></body></html>
